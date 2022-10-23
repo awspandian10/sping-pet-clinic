@@ -2,7 +2,7 @@ pipeline {
     agent any
     parameters { 
 	   choice(name: 'BRANCH_TO_BUILD', choices: ['master', 'ut', 'uat'], description: '') 
-	   string(name: 'MVN_GOAL', defaultValue: 'package', description: 'Who should I say hello to?')
+	   string(name: 'MVN_GOAL', defaultValue: 'mvn package', description: 'Who should I say hello to?')
 	   }
     stages {
         stage('Hello') {
