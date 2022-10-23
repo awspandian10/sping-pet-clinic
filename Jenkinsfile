@@ -4,6 +4,8 @@ pipeline {
 	   choice(name: 'BRANCH_TO_BUILD', choices: ['master', 'ut', 'uat'], description: '') 
 	   string(name: 'MVN_GOAL', defaultValue: 'mvn package', description: 'Who should I say hello to?')
 	   }
+	triggers { 
+	   pollSCM('H/05 * * * *') }  
     stages {
         stage('Hello') {
             steps {
