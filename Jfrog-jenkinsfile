@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'MAVEN_GOAL', defaultValue: 'clean install', description: 'maven goal')
+
+    }
+    stages {
+        stage('SCM') {
+            steps {
+                git branch: "ut", url: 'https://github.com/awspandian10/sping-pet-clinic.git'
+            }
+
+        }
+         stage ('Artifactory configuration') {
+            steps {
+                rtServer (
+                    id: "web-jfrog",
+                    url: "https://hippo1.jfrog.io",
+                    credentialsId: "JROG_OCT26"
+                )
+
+                rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "web-jfrog",
+                    releaseRepo: 'azcs-libs-release-local',
+                    snapshotRepo: 'azcs-libs-snapshot-local'
+                )
+
+
+            }
+        }
+
+        stage ('Exec Maven') {
+            steps {
+                rtMavenRun (
+                    tool: 'Maven_default', // Tool name from Jenkins configuration
+                    pom: 'pom.xml',
+                    goals: 'clean install',
+                    deployerId: "MAVEN_DEPLOYER"
+                )
+            }
+        }
+
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "web-jfrog"
+                )
+            }
+        }
+
+
+    }
+}
