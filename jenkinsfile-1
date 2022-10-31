@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    parameters { 
+	   choice(name: 'BRANCH_TO_BUILD', choices: ['master', 'ut', 'uat'], description: 'choose the branch') 
+	   string(name: 'MVN_GOAL', defaultValue: 'mvn package', description: 'build command')
+	   }
+	triggers { 
+	   pollSCM('* * * * *') }  
+    stages {
+        stage('SCM') {
+            steps {
+                git branch: "${params.BRANCH_TO_BUILD}", url: 'https://github.com/awspandian10/sping-pet-clinic.git'
+            }
+        }
+      stage('Build'){
+          steps {
+		    sh "${params.MVN_GOAL}"
+		}
+		}
+      stage('Results'){
+          steps {
+		    junit '**/surefire-reports/*.xml'
+		}
+		}		
+    }
+}
